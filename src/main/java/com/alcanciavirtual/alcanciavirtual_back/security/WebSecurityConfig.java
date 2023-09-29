@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,27 +21,25 @@ public class WebSecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JWTAuthorizationFilter jwtAuthorizationFilter;
-    
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter();
         jwtAuthenticationFilter.setAuthenticationManager(authManager);
-        jwtAuthenticationFilter.setFilterProcessesUrl("/login");
+        jwtAuthenticationFilter.setFilterProcessesUrl("/sapi/auth/login");
 
-        return http
-            .csrf().disable()
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .httpBasic()
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .addFilter(jwtAuthenticationFilter)
-            .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+        http
+        .cors()
+        .and()
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(request -> request.requestMatchers("/sapi/auth/**")
+        .permitAll()
+        .anyRequest()
+        .authenticated())
+        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilter(jwtAuthenticationFilter)
+        .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     /* @Bean

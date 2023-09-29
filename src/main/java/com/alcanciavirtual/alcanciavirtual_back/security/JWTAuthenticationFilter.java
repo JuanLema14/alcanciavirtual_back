@@ -1,6 +1,7 @@
 package com.alcanciavirtual.alcanciavirtual_back.security;
 
-
+import com.alcanciavirtual.alcanciavirtual_back.exepciones.NokResponseException;
+import com.alcanciavirtual.alcanciavirtual_back.model.ResponseData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             authCredentials = new ObjectMapper().readValue(request.getReader(), AuthCredentials.class);
         } catch (IOException e) {
+            throw new NokResponseException("Error al leer las credenciales");
         }
 
         UsernamePasswordAuthenticationToken usernamePAT = new UsernamePasswordAuthenticationToken(
@@ -35,12 +37,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
-    HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+            HttpServletResponse response, FilterChain chain, Authentication authResult)
+            throws IOException, ServletException {
 
-        UserDetailsImpl userDetails =  (UserDetailsImpl) authResult.getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         String token = TokenUtils.generateJWTToken(userDetails.getNombre(), userDetails.getUsername());
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        ResponseData responseData = new ResponseData("OK", "Ejecución satisfactoria", userDetails.getUsername(),
+                userDetails.getNombre());
+        String jsonResponse = objectMapper.writeValueAsString(responseData);
         response.addHeader("Authorization", "Bearer " + token);
+        response.setContentType("application/json");
+        response.getWriter().write(jsonResponse);
         response.getWriter().flush();
 
         super.successfulAuthentication(request, response, chain, authResult);

@@ -26,7 +26,6 @@ public class TokenUtils {
     public static String generateJWTToken(String nombre, String email) {
         long expirationTime = ACCESS_TOKEN_VALIDITY_SECONDS * 1000;
         Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
-
         Map<String, Object> extra = new HashMap<>();
         extra.put("nombre", nombre);
 

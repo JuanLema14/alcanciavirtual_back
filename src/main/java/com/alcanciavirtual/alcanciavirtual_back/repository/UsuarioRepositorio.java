@@ -9,7 +9,9 @@ import com.alcanciavirtual.alcanciavirtual_back.model.Usuario;
 
 
 @Repository
-public interface UsuarioRepositorio extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepositorio extends JpaRepository<Usuario, Integer> {
+
+    Optional<Usuario> findById(Integer id);
 
     Optional<Usuario> findOneByEmail(String email);
 }

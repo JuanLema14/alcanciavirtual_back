@@ -1,7 +1,6 @@
 package com.alcanciavirtual.alcanciavirtual_back.controller;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -89,8 +88,22 @@ public class ServiciosController {
     @GetMapping("/consultarservicio/{id}")
     public ResponseEntity<?> getServicioById(@PathVariable Integer id) {
         System.out.println("---------> Consultar Servicio controller");
-        Optional<Servicios> servicio = serviciosRepositorio.findById(id);
-        if (servicio != null) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String username = authentication.getName();
+
+        System.out.println("Usuario autenticado: " + username);
+
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+
+        Servicios servicio = serviciosRepositorio.findById(id).orElse(null);
+
+        if (servicio != null && usuarioAutenticado == servicio.getUsuario()) {
             return ResponseEntity.ok(servicio);
         } else {
             return ResponseEntity.notFound().build();
@@ -101,9 +114,22 @@ public class ServiciosController {
     public ResponseEntity<Servicios> editarServicio(@PathVariable Integer id,
             @RequestBody Servicios servicioActualizada) {
         System.out.println("---------> Actualizar Servicio controller");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String username = authentication.getName();
+
+        System.out.println("Usuario autenticado: " + username);
+
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+
         Servicios servicioExistente = serviciosRepositorio.findById(id).orElse(null);
 
-        if (servicioExistente != null) {
+        if (servicioExistente != null && usuarioAutenticado == servicioExistente.getUsuario()) {
             servicioExistente.setNombre_servicio(servicioActualizada.getNombre_servicio());
             servicioExistente.setValor_servicio(servicioActualizada.getValor_servicio());
             servicioExistente.setEstado(servicioActualizada.getEstado());
@@ -119,12 +145,27 @@ public class ServiciosController {
         }
     }
 
-    @DeleteMapping("/retirarservicio/{id}")
+
+    @GetMapping("/retirarservicio/{id}")
     public ResponseEntity<?> deleteServicio(@PathVariable Integer id) {
         System.out.println("---------> Retirar Servicio controller");
-        Optional<Servicios> servicioOptional = serviciosRepositorio.findById(id);
-        if (servicioOptional.isPresent()) {
-            serviciosRepositorio.delete(servicioOptional.get());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String username = authentication.getName();
+
+        System.out.println("Usuario autenticado: " + username);
+
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+
+        Servicios servicio = serviciosRepositorio.findById(id).orElse(null);
+
+        if (servicio != null && usuarioAutenticado == servicio.getUsuario()) {
+            serviciosRepositorio.delete(servicio);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

@@ -17,7 +17,6 @@ import com.alcanciavirtual.alcanciavirtual_back.model.Metas;
 import com.alcanciavirtual.alcanciavirtual_back.model.Usuario;
 import com.alcanciavirtual.alcanciavirtual_back.repository.MetasRepositorio;
 import com.alcanciavirtual.alcanciavirtual_back.repository.UsuarioRepositorio;
-import com.alcanciavirtual.alcanciavirtual_back.security.UserDetailsImpl;
 
 @RestController
 @RequestMapping("/${alcancia_dev.prefix}/metas")
@@ -90,8 +89,22 @@ public class MetasController {
     @GetMapping("/consultarmeta/{id}")
     public ResponseEntity<?> getMetaById(@PathVariable Integer id) {
         System.out.println("---------> Consultar Meta controller");
-        Optional<Metas> meta = metasRepositorio.findById(id);
-        if (meta != null) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String username = authentication.getName();
+
+        System.out.println("Usuario autenticado: " + username);
+
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+
+        Metas meta = metasRepositorio.findById(id).orElse(null);
+
+        if (meta != null && meta.getUsuario() == usuarioAutenticado) {
             return ResponseEntity.ok(meta);
         } else {
             return ResponseEntity.notFound().build();
@@ -101,9 +114,22 @@ public class MetasController {
     @PutMapping("/actualizarmeta/{id}")
     public ResponseEntity<Metas> editarMeta(@PathVariable Integer id, @RequestBody Metas metaActualizada) {
         System.out.println("---------> Actualizar Meta controller");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String username = authentication.getName();
+
+        System.out.println("Usuario autenticado: " + username);
+
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+
         Metas metaExistente = metasRepositorio.findById(id).orElse(null);
 
-        if (metaExistente != null) {
+        if (metaExistente != null && metaExistente.getUsuario() == usuarioAutenticado) {
             metaExistente.setCantidad_meta(metaActualizada.getCantidad_meta());
             metaExistente.setCantidad_abonada(metaActualizada.getCantidad_abonada());
             metaExistente.setEstado(metaActualizada.getEstado());
@@ -122,9 +148,22 @@ public class MetasController {
     @DeleteMapping("/retirarmeta/{id}")
     public ResponseEntity<?> deleteMeta(@PathVariable Integer id) {
         System.out.println("---------> Retirar Meta controller");
-        Optional<Metas> metaOptional = metasRepositorio.findById(id);
-        if (metaOptional.isPresent()) {
-            metasRepositorio.delete(metaOptional.get());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String username = authentication.getName();
+
+        System.out.println("Usuario autenticado: " + username);
+
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+
+        Metas metaOptional = metasRepositorio.findById(id).orElse(null);
+        if (metaOptional != null && metaOptional.getUsuario() == usuarioAutenticado) {
+            metasRepositorio.delete(metaOptional);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

@@ -146,7 +146,7 @@ public class ServiciosController {
     }
 
 
-    @GetMapping("/retirarservicio/{id}")
+    @DeleteMapping("/retirarservicio/{id}")
     public ResponseEntity<?> deleteServicio(@PathVariable Integer id) {
         System.out.println("---------> Retirar Servicio controller");
 

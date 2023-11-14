@@ -2,6 +2,8 @@ package com.alcanciavirtual.alcanciavirtual_back.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -96,6 +98,7 @@ public class Metas {
         this.descripcion_meta = descripcion_meta;
     }
 
+    @JsonIgnore
     public Usuario getUsuario() {
         return id_usuario;
     }

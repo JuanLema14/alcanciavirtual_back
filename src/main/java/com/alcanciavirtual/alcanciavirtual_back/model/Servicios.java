@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "servicios")
 public class Servicios {
@@ -112,6 +114,7 @@ public class Servicios {
         this.tipo_servicio = tipo_servicio;
     }
 
+    @JsonIgnore
     public Usuario getUsuario() {
         return id_usuario;
     }

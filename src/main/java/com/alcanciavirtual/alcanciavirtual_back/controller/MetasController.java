@@ -134,7 +134,7 @@ public class MetasController {
             metaExistente.setCantidad_abonada(metaActualizada.getCantidad_abonada());
             metaExistente.setEstado(metaActualizada.getEstado());
             metaExistente.setDescripcion_meta(metaActualizada.getDescripcion_meta());
-            metaExistente.setUsuario(metaActualizada.getUsuario());
+            metaExistente.setUsuario(usuarioAutenticado);
             metaExistente.setFecha_creacion(metaActualizada.getFecha_creacion());
             metaExistente.setFecha_esperada(metaActualizada.getFecha_esperada());
 

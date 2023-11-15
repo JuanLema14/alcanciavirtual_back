@@ -136,7 +136,7 @@ public class ServiciosController {
             servicioExistente.setCantidad_meses(servicioActualizada.getCantidad_meses());
             servicioExistente.setFecha_pago(servicioActualizada.getFecha_pago());
             servicioExistente.setTipo_servicio(servicioActualizada.getTipo_servicio());
-            servicioExistente.setUsuario(servicioActualizada.getUsuario());
+            servicioExistente.setUsuario(usuarioAutenticado);
 
             Servicios servicioActualizadoEnBD = serviciosRepositorio.save(servicioExistente);
             return ResponseEntity.ok(servicioActualizadoEnBD);

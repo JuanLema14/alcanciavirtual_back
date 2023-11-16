@@ -34,7 +34,6 @@ public class MetasController {
             @RequestParam int cantidad_abonada,
             @RequestParam EstadoMeta estado,
             @RequestParam String descripcion_meta,
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam LocalDateTime fecha_creacion,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam LocalDateTime fecha_esperada) {
 
         System.out.println("---------> Crear Meta controller");
@@ -51,9 +50,10 @@ public class MetasController {
 
         Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
 
+        LocalDateTime fechaCreacion = LocalDateTime.now();
+
         Metas nuevaMeta = new Metas(cantidad_meta, cantidad_abonada, estado, descripcion_meta, usuarioAutenticado,
-                fecha_creacion,
-                fecha_esperada);
+                fechaCreacion, fecha_esperada);
 
         Metas metaCreado = metasRepositorio.save(nuevaMeta);
 
@@ -135,7 +135,6 @@ public class MetasController {
             metaExistente.setEstado(metaActualizada.getEstado());
             metaExistente.setDescripcion_meta(metaActualizada.getDescripcion_meta());
             metaExistente.setUsuario(usuarioAutenticado);
-            metaExistente.setFecha_creacion(metaActualizada.getFecha_creacion());
             metaExistente.setFecha_esperada(metaActualizada.getFecha_esperada());
 
             Metas metaActualizadaEnBD = metasRepositorio.save(metaExistente);

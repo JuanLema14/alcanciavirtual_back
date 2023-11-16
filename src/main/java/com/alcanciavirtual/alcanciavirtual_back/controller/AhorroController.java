@@ -38,33 +38,37 @@ public class AhorroController {
     private UsuarioRepositorio usuarioRepositorio;
 
     @GetMapping("/ahorrototal")
-    public ResponseEntity<Integer> getAhorroTotal(
-            @RequestParam() Boolean valorMetas) {
+public ResponseEntity<Integer> getAhorroTotal(
+        @RequestParam() Boolean valorMetas) {
 
-        System.out.println("---------> Sumar ahorro total Controller");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println("---------> Sumar ahorro total Controller");
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getPrincipal() != null) {
-            String username = authentication.getName();
+    if (authentication != null && authentication.getPrincipal() != null) {
+        String username = authentication.getName();
 
-            System.out.println("Usuario autenticado: " + username);
+        System.out.println("Usuario autenticado: " + username);
 
-            Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
+        Usuario usuarioAutenticado = usuarioRepositorio.findOneByEmail(username).orElse(null);
 
-            if (usuarioAutenticado != null) {
-                int valorTotalAhorro = ahorroRepositorio.sumValorAhorroByIdUsuario(usuarioAutenticado.getId());
-                if (valorMetas) {
-                    int valorTotal = metasRepositorio.sumValorMetasByIdUsuario(usuarioAutenticado.getId())
-                            + valorTotalAhorro;
-                    return ResponseEntity.ok(valorTotal);
-                } else {
-                    return ResponseEntity.ok(valorTotalAhorro);
-                }
+        if (usuarioAutenticado != null) {
+            Integer valorTotalAhorro = ahorroRepositorio.sumValorAhorroByIdUsuario(usuarioAutenticado.getId());
+
+            if (valorTotalAhorro != null) {
+                int valorTotal = valorMetas ? 
+                        metasRepositorio.sumValorMetasByIdUsuario(usuarioAutenticado.getId()) + valorTotalAhorro :
+                        valorTotalAhorro;
+
+                return ResponseEntity.ok(valorTotal);
+            } else {
+                return ResponseEntity.ok(0); 
             }
         }
-
-        return ResponseEntity.badRequest().build();
     }
+
+    return ResponseEntity.badRequest().build();
+}
+
 
     @GetMapping("/listarahorro")
     public ResponseEntity<List<Ahorro>> listarAhorros() {

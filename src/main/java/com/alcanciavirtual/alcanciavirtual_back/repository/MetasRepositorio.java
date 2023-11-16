@@ -20,5 +20,6 @@ public interface MetasRepositorio extends JpaRepository<Metas, Integer> {
     @Query("SELECT m FROM Metas m WHERE m.id_usuario.id = :userId")
     Page<Metas> findByIdUsuario(Integer userId, Pageable pageable);
 
-
+    @Query("SELECT SUM(m.cantidad_abonada) FROM Metas m WHERE m.id_usuario.id = :userId")
+    Integer sumValorMetasByIdUsuario(Integer userId);
 }

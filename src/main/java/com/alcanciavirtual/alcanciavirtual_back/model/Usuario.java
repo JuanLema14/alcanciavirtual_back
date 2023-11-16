@@ -27,6 +27,9 @@ public class Usuario {
     @Column(name = "last_seen_at", nullable = true)
     private Long last_seen_at;
 
+    @Column(name = "valor_a_ahorrar", nullable = true)
+    private Integer valor_a_ahorrar;
+
     public Usuario() {
 
     }
@@ -78,6 +81,14 @@ public class Usuario {
 
     public void setLast_seen_at(Long last_seen_at) {
         this.last_seen_at = last_seen_at;
+    }
+
+    public Integer getValoraAhorrar() {
+        return valor_a_ahorrar;
+    }
+
+    public void setValoraAhorrar(Integer valor_a_ahorrar) {
+        this.valor_a_ahorrar = valor_a_ahorrar;
     }
 
 }
